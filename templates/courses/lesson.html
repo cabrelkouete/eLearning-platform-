@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}{{ lesson.title }} — {{ lesson.chapter.course.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-9">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'courses:list' %}" class="text-success">Courses</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'courses:detail' lesson.chapter.course.slug %}" class="text-success">{{ lesson.chapter.course.title }}</a></li>
+                <li class="breadcrumb-item active">{{ lesson.title }}</li>
+            </ol>
+        </nav>
+
+        <h2 class="fw-bold mb-4">{{ lesson.title }}</h2>
+
+        <!-- LECTEUR VIDÉO / AUDIO -->
+        {% if lesson.media_file %}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-0 bg-dark rounded">
+                    {% if lesson.media_type == 'VIDEO' %}
+                        <video controls class="w-100 rounded" style="max-height: 500px;">
+                            <source src="{{ lesson.media_file.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    {% elif lesson.media_type == 'AUDIO' %}
+                        <div class="p-5 text-center">
+                            <i class="bi bi-music-note-beamed display-1 text-white mb-3"></i>
+                            <audio controls class="w-100">
+                                <source src="{{ lesson.media_file.url }}" type="audio/mpeg">
+                            </audio>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- CONTENU TEXTE -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-4">
+                <h5 class="text-success mb-3">Lesson Content</h5>
+                <p>{{ lesson.content|linebreaks }}</p>
+            </div>
+        </div>
+
+        <!-- DOCUMENTS PDF / WORD -->
+        {% if lesson.documents.all %}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white fw-bold py-3">
+                    <i class="bi bi-paperclip text-success"></i> Attached Documents
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for doc in lesson.documents.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                        <div>
+                            <i class="bi bi-file-earmark-text text-primary me-2"></i>
+                            <strong>{{ doc.title }}</strong>
+                            <small class="text-muted ms-2">({{ doc.file_type|upper }})</small>
+                        </div>
+                        <a href="{{ doc.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i> View / Download
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- SIDEBAR : NOTES ET CHATBOT -->
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+            <div class="card-body text-center">
+                <h5 class="mb-3">Need help?</h5>
+                <a href="{% url 'chatbot:home' %}" class="btn btn-success w-100 shadow-sm mb-3"><i class="bi bi-robot"></i> Ask Inspect-IA</a>
+                
+                <hr>
+                
+                <h6 class="text-start text-muted mb-2">Add a timestamped note</h6>
+                <form method="post" action="{% url 'progress:add_note' lesson.id %}">
+                    {% csrf_token %}
+                    <textarea name="content" class="form-control mb-2" rows="2" placeholder="Write a note..." required></textarea>
+                    <input type="number" name="timestamp_sec" class="form-control mb-2" placeholder="Timestamp (seconds)" value="0">
+                    <button type="submit" class="btn btn-outline-success w-100">Save Note</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Teacher Dashboard — Auto-Learn 237{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-success fw-bold"><i class="bi bi-person-video3"></i> Teacher Dashboard</h2>
+    <!-- Lien vers l'admin Django -->
+    <a href="/admin/courses/course/add/" class="btn btn-success shadow" target="_blank"><i class="bi bi-plus-circle"></i> Create New Course</a>
+</div>
+
+<h4 class="mb-3 text-muted">My Courses</h4>
+<div class="row g-4">
+    {% for course in my_courses %}
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            {% if course.cover_image %}
+                <img src="{{ course.cover_image.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 150px; object-fit: cover;">
+            {% else %}
+                <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 150px;">
+                    <i class="bi bi-book fs-1"></i>
+                </div>
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ course.title }}</h5>
+                <p class="card-text text-muted small">{{ course.description|truncatechars:80 }}</p>
+                <span class="badge bg-{{ course.status|lower }}">{{ course.get_status_display }}</span>
+            </div>
+            <div class="card-footer bg-white border-0">
+                <a href="{% url 'courses:detail' course.slug %}" class="btn btn-outline-success btn-sm w-100">View Course</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-warning">You haven't created any courses yet. Click the button above to start!</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

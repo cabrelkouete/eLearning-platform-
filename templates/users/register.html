@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Register — E-learning Platform{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5 mb-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h3 class="text-center mb-4">Create an account</h3>
+                
+                <form method="post" novalidate id="registerForm">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Role Selection -->
+                    <div class="mb-4 text-center">
+                        <label class="form-label fw-bold">{{ form.role.label }}</label>
+                        <div class="d-flex justify-content-center gap-4 mt-2">
+                            {% for radio in form.role %}
+                                <div class="form-check">
+                                    {{ radio.tag }}
+                                    <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.role.errors %}<div class="text-danger small">{{ form.role.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <!-- First Name and Last Name -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}<div class="text-danger small">{{ form.first_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}<div class="text-danger small">{{ form.last_name.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <!-- Student Fields (Matricule & Level) -->
+                    <div id="student-fields" class="border p-3 rounded mb-3 bg-light" style="display: none;">
+                        <h6 class="mb-3 text-primary"><i class="bi bi-person-badge"></i> Student Information</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.registration_number.id_for_label }}" class="form-label">{{ form.registration_number.label }}</label>
+                                {{ form.registration_number }}
+                                {% if form.registration_number.errors %}<div class="text-danger small">{{ form.registration_number.errors.0 }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.level.id_for_label }}" class="form-label">{{ form.level.label }}</label>
+                                {{ form.level }}
+                                {% if form.level.errors %}<div class="text-danger small">{{ form.level.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Teacher Fields (Access Code) -->
+                    <div id="teacher-fields" class="border p-3 rounded mb-3 bg-light" style="display: none;">
+                        <h6 class="mb-3 text-success"><i class="bi bi-shield-lock"></i> Teacher Information</h6>
+                        <div class="mb-3">
+                            <label for="{{ form.teacher_access_code.id_for_label }}" class="form-label">{{ form.teacher_access_code.label }}</label>
+                            {{ form.teacher_access_code }}
+                            <div class="form-text">Contact administration if you don't have a code.</div>
+                            {% if form.teacher_access_code.errors %}<div class="text-danger small">{{ form.teacher_access_code.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Passwords -->
+                    <div class="mb-3">
+                        <label for="{{ form.password1.id_for_label }}" class="form-label">{{ form.password1.label }}</label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}<div class="text-danger small">{{ form.password1.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.password2.id_for_label }}" class="form-label">{{ form.password2.label }}</label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}<div class="text-danger small">{{ form.password2.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+                </form>
+                
+                <div class="text-center mt-3">
+                    <p class="mb-0">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleRadios = document.querySelectorAll('input[name="role"]');
+        const studentFields = document.getElementById('student-fields');
+        const teacherFields = document.getElementById('teacher-fields');
+
+        function toggleFields() {
+            const selectedRole = document.querySelector('input[name="role"]:checked').value;
+            
+            if (selectedRole === 'STUDENT') {
+                studentFields.style.display = 'block';
+                teacherFields.style.display = 'none';
+            } else if (selectedRole === 'TEACHER') {
+                studentFields.style.display = 'none';
+                teacherFields.style.display = 'block';
+            }
+        }
+
+        roleRadios.forEach(radio => {
+            radio.addEventListener('change', toggleFields);
+        });
+
+        toggleFields();
+    });
+</script>
+{% endblock %}

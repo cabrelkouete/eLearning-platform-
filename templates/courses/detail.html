@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.title }} — Auto-Learn 237{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="text-success fw-bold">{{ course.title }}</h1>
+        <p class="lead">{{ course.description }}</p>
+        
+        <h3 class="mt-5 mb-3">Course Content</h3>
+        <div class="accordion shadow-sm" id="courseAccordion">
+            {% for chapter in course.chapters.all %}
+            <div class="accordion-item border-0 mb-2">
+                <h2 class="accordion-header">
+                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %} bg-light fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#chapter{{ chapter.id }}">
+                        Chapter {{ chapter.position }}: {{ chapter.title }}
+                    </button>
+                </h2>
+                <div id="chapter{{ chapter.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#courseAccordion">
+                    <div class="accordion-body p-0">
+                        <ul class="list-group list-group-flush">
+                            {% for lesson in chapter.lessons.all %}
+                            <li class="list-group-item py-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <i class="bi bi-play-circle text-success me-2"></i> 
+                                        <strong>{{ lesson.title }}</strong>
+                                    </div>
+                                    {% if is_enrolled or lesson.is_free %}
+                                        <a href="{% url 'courses:lesson' course.slug lesson.id %}" class="btn btn-sm btn-outline-success">Start Lesson</a>
+                                    {% else %}
+                                        <span class="badge bg-secondary"><i class="bi bi-lock"></i> Locked</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- AFFICHAGE DES DOCUMENTS PDF/WORD -->
+                                {% if lesson.documents.all %}
+                                    <div class="mt-2 ps-4">
+                                        <small class="text-muted d-block mb-1">Attached Documents:</small>
+                                        {% for doc in lesson.documents.all %}
+                                            {% if is_enrolled or lesson.is_free %}
+                                                <a href="{{ doc.file.url }}" target="_blank" class="btn btn-sm btn-light border text-primary me-2 mb-1">
+                                                    <i class="bi bi-file-earmark-pdf"></i> {{ doc.title }}
+                                                </a>
+                                            {% else %}
+                                                <span class="badge bg-light text-dark border me-2 mb-1"><i class="bi bi-lock"></i> {{ doc.title }}</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-muted">No chapters added yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+            <div class="card-body text-center">
+                <h4 class="mb-3">Ready to learn?</h4>
+                {% if is_enrolled %}
+                    <div class="alert alert-success"><i class="bi bi-check-circle-fill"></i> You are enrolled!</div>
+                {% else %}
+                    <a href="{% url 'progress:enroll' course.slug %}" class="btn btn-success btn-lg w-100 shadow">Enroll Now</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

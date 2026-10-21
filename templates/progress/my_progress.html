@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}My Progress — Auto-Learn 237{% endblock %}
+
+{% block content %}
+<h2 class="text-success fw-bold mb-4"><i class="bi bi-graph-up-arrow"></i> My Learning Progress</h2>
+
+<div class="row">
+    {% for enrollment in enrollments %}
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title fw-bold">{{ enrollment.course.title }}</h5>
+                <p class="text-muted small mb-3">Enrolled on {{ enrollment.enrolled_at|date:"M d, Y" }}</p>
+                
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="small fw-bold">Progress</span>
+                    <span class="small fw-bold">{{ enrollment.progress_percent }}%</span>
+                </div>
+                <div class="progress mb-3" style="height: 10px;">
+                    <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ enrollment.progress_percent }}%" aria-valuenow="{{ enrollment.progress_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                
+                <a href="{% url 'courses:detail' enrollment.course.slug %}" class="btn btn-outline-success btn-sm w-100">Continue Learning</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">You are not enrolled in any course yet. <a href="{% url 'courses:list' %}">Browse courses</a></div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

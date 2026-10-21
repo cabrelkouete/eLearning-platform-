@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Studio — Auto-Learn 237{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-success fw-bold"><i class="bi bi-camera-video"></i> Content Studio</h2>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- Créer un Cours -->
+    <div class="col-md-3">
+        <div class="card bg-success text-white border-0 shadow-sm h-100 text-center p-3">
+            <i class="bi bi-journal-plus display-4 mb-2"></i>
+            <h6>Create Course</h6>
+            <a href="{% url 'courses:create_course' %}" class="btn btn-light text-success mt-auto w-100">New Course</a>
+        </div>
+    </div>
+    
+    <!-- Ajouter une Leçon (Vidéo) -->
+    <div class="col-md-3">
+        <div class="card bg-primary text-white border-0 shadow-sm h-100 text-center p-3">
+            <i class="bi bi-play-btn display-4 mb-2"></i>
+            <h6>Upload Video</h6>
+            <a href="{% url 'courses:add_lesson' %}" class="btn btn-light text-primary mt-auto w-100">Add Lesson</a>
+        </div>
+    </div>
+    
+    <!-- Ajouter un Document (PDF/Word) -->
+    <div class="col-md-3">
+        <div class="card bg-info text-white border-0 shadow-sm h-100 text-center p-3">
+            <i class="bi bi-file-earmark-pdf display-4 mb-2"></i>
+            <h6>Upload PDF/Word</h6>
+            <a href="{% url 'courses:add_document' %}" class="btn btn-light text-info mt-auto w-100">Add Document</a>
+        </div>
+    </div>
+    
+    <!-- Créer un Quiz -->
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark border-0 shadow-sm h-100 text-center p-3">
+            <i class="bi bi-patch-question display-4 mb-2"></i>
+            <h6>Create Quiz</h6>
+            <a href="{% url 'courses:create_quiz' %}" class="btn btn-light text-warning mt-auto w-100">New Quiz</a>
+        </div>
+    </div>
+</div>
+
+<h4 class="mb-3 text-muted">My Courses</h4>
+<div class="row g-4">
+    {% for course in my_courses %}
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ course.title }}</h5>
+                <p class="text-muted small mb-2">{{ course.total_lessons }} Lessons • {{ course.total_chapters }} Chapters</p>
+            </div>
+            <div class="card-footer bg-white border-0">
+                <a href="{% url 'courses:detail' course.slug %}" class="btn btn-sm btn-outline-success w-100">View Course</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-warning">You haven't created any courses yet.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
